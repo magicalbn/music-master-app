@@ -1,5 +1,4 @@
-import React, { Component } from 'react';
-
+import React, { Component } from "react";
 
 /*const Eachtrack = props => {
     const { album, name,preview_url } = props.track;
@@ -76,88 +75,113 @@ class Eachtrack extends Component {
     }
 }*/
 
-
 class Tracks extends Component {
-    
     componentWillUnmount() {
-        if(this.state.currentAudio)
-        this.pauseAudio(this.state.currentAudio)
+        if (this.state.currentAudio) this.pauseAudio(this.state.currentAudio);
     }
 
-    state = { playing: false, currentAudio: null, previousSongURL: "" }
+    state = { playing: false, currentAudio: null, previousSongURL: "" };
 
-    playAudio = previewUrl => () => {
-      //  console.log(this.state.playing);
-      //  console.log("state", this.state);
-
+    playAudio = (previewUrl) => () => {
+        //  console.log(this.state.playing);
+        //  console.log("state", this.state);
 
         if (!this.state.playing) {
             const audio = new Audio(previewUrl);
+            audio.volume = 0.2;
             audio.play();
-            this.setState({ playing: true, currentAudio: audio, previousSongURL: previewUrl });
-        }
-        else {
+            this.setState({
+                playing: true,
+                currentAudio: audio,
+                previousSongURL: previewUrl,
+            });
+        } else {
             this.pauseAudio(previewUrl);
         }
-    }
+    };
 
-    pauseAudio = previewUrl => {
+    pauseAudio = (previewUrl) => {
         this.state.currentAudio.pause();
         this.setState({ playing: false });
         if (this.state.previousSongURL != previewUrl) {
-          //  console.log("trackChanged");
+            //  console.log("trackChanged");
             const audio = new Audio(previewUrl);
+            audio.volume = 0.2;
             audio.play();
-            this.setState({ playing: true, currentAudio: audio, previousSongURL: previewUrl });
+            this.setState({
+                playing: true,
+                currentAudio: audio,
+                previousSongURL: previewUrl,
+            });
+        } else {
+            this.setState({ previewUrl: "" });
         }
-        else {
-            this.setState({ previewUrl: "" })
-        }
 
+        // console.log("pause", this.state.playing);
+    };
 
-       // console.log("pause", this.state.playing);
-    }
-
-    trackIcon = track => {
+    trackIcon = (track) => {
         if (track.preview_url == null) {
-            return <span className="tracks__icon"><i className="fas fa-ban"></i></span>
+            return (
+                <span className="tracks__icon">
+                    <i className="fas fa-ban"></i>
+                </span>
+            );
+        } else if (
+            this.state.playing &&
+            this.state.previousSongURL == track.preview_url
+        ) {
+            return (
+                <span className="tracks__icon">
+                    <i className="fas fa-pause"></i>
+                </span>
+            );
         }
-        else if (this.state.playing && this.state.previousSongURL == track.preview_url) {
-             return <span className="tracks__icon"><i className="fas fa-pause"></i></span> 
-            }
-         return <span className="tracks__icon"><i className="fas fa-play"></i></span>
-    }
+        return (
+            <span className="tracks__icon">
+                <i className="fas fa-play"></i>
+            </span>
+        );
+    };
 
     render() {
-
-        if (this.props.tracklist.length == 0)
-            return null;
+        if (this.props.tracklist.length == 0) return null;
 
         const TRACKS = this.props.tracklist;
         //console.log("Tracks", TRACKS);
         return (
             <div className="tracks">
                 <div className="tracks__list">
-                    {
-                        TRACKS.map(TRACK => {
-                            /* <Eachtrack key={TRACK.id} track={TRACK} />*/
-                            const { album, name, preview_url } = TRACK;
-                            
-                            return (
-                                <div key={TRACK.id} className="tracks__card" onClick={this.playAudio(preview_url)}>
-                                    <img src={album.images[1].url}></img>
-                                    <div className="tracks__details">
+                    {TRACKS.map((TRACK) => {
+                        /* <Eachtrack key={TRACK.id} track={TRACK} />*/
+                        const { album, name, preview_url, artists } = TRACK;
 
-                                        <h5>{name}</h5>
-                                        
-                                    </div>
+                        return (
+                            <div
+                                key={TRACK.id}
+                                className="tracks__card"
+                                onClick={this.playAudio(preview_url)}
+                            >
+                                <div className="tracks__container">
+                                    <img src={album.images[1].url}></img>
                                     {this.trackIcon(TRACK)}
                                 </div>
-                            )
-
-                        }
-                        )
-                    }
+                                <div className="tracks__details">
+                                    <h5>{name}</h5>
+                                    <div className="tracks__artists">
+                                        {artists.map((eachArtist, index) => {
+                                            return (
+                                                <span>
+                                                    {index > 0 && ","}{" "}
+                                                    {eachArtist.name}
+                                                </span>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         );
@@ -165,5 +189,3 @@ class Tracks extends Component {
 }
 
 export default Tracks;
-
-
